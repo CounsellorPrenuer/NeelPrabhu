@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import CompassIcon from "@/components/ui/compass-icon";
+import logoImage from "@assets/Careermentoria Logo with Compass Icon - Neel Prabhu_1758711922420.png";
 
 const navigationItems = [
   { href: "#home", label: "Home" },
@@ -30,9 +30,12 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 compass-gradient rounded-lg flex items-center justify-center">
-              <CompassIcon className="w-6 h-6 text-primary-foreground animate-compass-spin" />
-            </div>
+            <img 
+              src={logoImage} 
+              alt="CareerMentoria Logo" 
+              className="w-10 h-10 object-contain"
+              data-testid="logo-image"
+            />
             <span className="text-xl font-bold text-foreground">CareerMentoria</span>
           </div>
 

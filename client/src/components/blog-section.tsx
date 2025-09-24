@@ -72,9 +72,7 @@ export default function BlogSection() {
             <h2 className="text-fluid-3xl lg:text-fluid-4xl font-bold text-foreground mb-6 text-balance" data-testid="blog-main-heading">
               Career Insights
               <br />
-              <span className="gradient-secondary bg-clip-text text-transparent">
-                & Expert Guidance
-              </span>
+              & Expert Guidance
             </h2>
           </MotionDiv>
           

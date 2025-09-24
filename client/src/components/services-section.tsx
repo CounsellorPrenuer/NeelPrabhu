@@ -68,9 +68,7 @@ export default function ServicesSection() {
             <h2 className="text-fluid-3xl lg:text-fluid-4xl font-bold text-foreground mb-6 text-balance" data-testid="services-main-heading">
               Comprehensive Career Guidance
               <br />
-              <span className="gradient-primary bg-clip-text text-transparent">
-                Tailored for You
-              </span>
+              Tailored for You
             </h2>
           </MotionDiv>
           
@@ -112,7 +110,7 @@ export default function ServicesSection() {
                       </div>
                       {service.price && (
                         <div className="text-right">
-                          <div className="text-fluid-2xl font-bold gradient-primary bg-clip-text text-transparent">
+                          <div className="text-fluid-2xl font-bold text-primary">
                             ₹{service.price.toLocaleString()}
                           </div>
                           <div className="text-xs text-muted-foreground">One-time</div>

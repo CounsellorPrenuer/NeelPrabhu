@@ -80,9 +80,7 @@ export default function HeroSection() {
             <h1 className="text-fluid-4xl lg:text-fluid-5xl font-bold text-foreground mb-6 text-balance leading-tight">
               Future-Proof Your Career.{" "}
               <br className="hidden sm:block" />
-              <span className="gradient-primary bg-clip-text text-transparent animate-gradient-shift">
-                Shape Your Tomorrow.
-              </span>
+              Shape Your Tomorrow.
             </h1>
           </MotionDiv>
           
