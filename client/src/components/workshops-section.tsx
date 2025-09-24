@@ -82,9 +82,7 @@ export default function WorkshopsSection() {
             <h2 className="text-fluid-3xl lg:text-fluid-4xl font-bold text-foreground mb-6 text-balance" data-testid="workshops-main-heading">
               Transformative Workshops
               <br />
-              <span className="gradient-accent bg-clip-text text-transparent">
-                & Expert Seminars
-              </span>
+              & Expert Seminars
             </h2>
           </MotionDiv>
           

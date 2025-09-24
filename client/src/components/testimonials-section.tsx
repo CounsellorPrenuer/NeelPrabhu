@@ -93,9 +93,7 @@ export default function TestimonialsSection() {
             <h2 className="text-fluid-3xl lg:text-fluid-4xl font-bold text-foreground mb-6 text-balance" data-testid="testimonials-main-heading">
               Transforming Lives Through
               <br />
-              <span className="gradient-primary bg-clip-text text-transparent">
-                Expert Guidance
-              </span>
+              Expert Guidance
             </h2>
           </MotionDiv>
           
@@ -251,7 +249,7 @@ export default function TestimonialsSection() {
               <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse-glow transition-all">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <div className="text-fluid-3xl font-bold gradient-primary bg-clip-text text-transparent mb-2">98%</div>
+              <div className="text-fluid-3xl font-bold text-primary mb-2">98%</div>
               <p className="text-muted-foreground font-medium">Client Satisfaction Rate</p>
             </MotionCard>
             
@@ -264,7 +262,7 @@ export default function TestimonialsSection() {
               <div className="w-16 h-16 gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse-glow transition-all">
                 <Users className="w-8 h-8 text-white" />
               </div>
-              <div className="text-fluid-3xl font-bold gradient-secondary bg-clip-text text-transparent mb-2">5000+</div>
+              <div className="text-fluid-3xl font-bold text-secondary mb-2">5000+</div>
               <p className="text-muted-foreground font-medium">Lives Transformed</p>
             </MotionCard>
             
@@ -277,7 +275,7 @@ export default function TestimonialsSection() {
               <div className="w-16 h-16 gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse-glow transition-all">
                 <Award className="w-8 h-8 text-white" />
               </div>
-              <div className="text-fluid-3xl font-bold gradient-accent bg-clip-text text-transparent mb-2">200+</div>
+              <div className="text-fluid-3xl font-bold text-accent mb-2">200+</div>
               <p className="text-muted-foreground font-medium">Institutional Partners</p>
             </MotionCard>
           </div>
