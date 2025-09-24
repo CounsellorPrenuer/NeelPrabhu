@@ -54,7 +54,7 @@ export default function BlogSection() {
   }
 
   return (
-    <MotionSection id="blog" className="py-20 space-fluid-xl bg-gradient-to-br from-background via-background-alt to-background relative overflow-hidden">
+    <MotionSection className="py-20 space-fluid-xl bg-gradient-to-br from-background via-background-alt to-background relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-16 right-16 w-40 h-40 gradient-primary rounded-full mix-blend-multiply filter blur-2xl opacity-15 animate-float"></div>
       <div className="absolute bottom-16 left-16 w-52 h-52 gradient-secondary rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-float" style={{ animationDelay: '2s' }}></div>
