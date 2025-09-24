@@ -10,50 +10,18 @@ export default function WorkshopsSection() {
     queryKey: ["/api/workshops"],
   });
 
-  // Fallback workshops for demonstration
-  const fallbackWorkshops = [
-    {
-      id: "1",
-      title: "Career Awareness Program for Class 10-12 Students",
-      description: "Discover your strengths, explore career options, and make informed decisions about your academic future.",
-      date: new Date("2025-03-15T10:00:00"),
-      duration: "2 hours",
-      targetAudience: "Students",
-      price: "2999",
-      maxParticipants: 50,
-      registeredCount: 23,
-      isActive: true,
-      createdAt: new Date()
-    },
-    {
-      id: "2", 
-      title: "Future-Ready Skills for Professionals",
-      description: "AI literacy, digital transformation, and career resilience in the changing job market.",
-      date: new Date("2025-03-22T14:00:00"),
-      duration: "3 hours",
-      targetAudience: "Professionals",
-      price: "4999",
-      maxParticipants: 30,
-      registeredCount: 18,
-      isActive: true,
-      createdAt: new Date()
-    },
-    {
-      id: "3",
-      title: "Parent's Guide to Supporting Career Decisions",
-      description: "Learn how to guide your children effectively through career planning and decision-making.",
-      date: new Date("2025-03-29T11:00:00"),
-      duration: "2 hours",
-      targetAudience: "Parents",
-      price: "1999",
-      maxParticipants: 40,
-      registeredCount: 32,
-      isActive: true,
-      createdAt: new Date()
+  // Get category display name
+  const getCategoryDisplayName = (category: string | null) => {
+    switch(category) {
+      case 'schools': return 'Students';
+      case 'parents': return 'Parents';
+      case 'corporates': return 'Corporates';
+      default: return 'General';
     }
-  ];
+  };
 
-  const displayWorkshops = workshops.length > 0 ? workshops : fallbackWorkshops;
+  // Display actual workshops from database or show empty state
+  const displayWorkshops = workshops;
 
   const handleWorkshopRegistration = (workshopId: string) => {
     // This would integrate with the workshop registration system
@@ -126,7 +94,7 @@ export default function WorkshopsSection() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="text-muted-foreground mt-4">Loading workshops...</p>
               </div>
-            ) : (
+            ) : displayWorkshops.length > 0 ? (
               <div className="space-y-6">
                 {displayWorkshops.map((workshop, index) => (
                   <Card key={workshop.id} className="border hover:shadow-md transition-shadow" data-testid={`workshop-${index}`}>
@@ -136,32 +104,34 @@ export default function WorkshopsSection() {
                           <div className="flex items-center space-x-2 mb-2">
                             <h4 className="text-lg font-semibold text-foreground">{workshop.title}</h4>
                             <Badge variant="outline" className="text-xs">
-                              {workshop.targetAudience}
+                              {getCategoryDisplayName(workshop.category)}
                             </Badge>
                           </div>
-                          <p className="text-muted-foreground mb-3">{workshop.description}</p>
+                          <p className="text-muted-foreground mb-3">{workshop.description || "Workshop details will be provided upon registration."}</p>
                           
                           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center space-x-1">
                               <Calendar className="w-4 h-4" />
-                              <span>{new Date(workshop.date).toLocaleDateString()}</span>
+                              <span>{workshop.date ? new Date(workshop.date).toLocaleDateString() : "Date TBD"}</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Clock className="w-4 h-4" />
-                              <span>{workshop.duration}</span>
+                              <span>2-3 hours</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <MapPin className="w-4 h-4" />
-                              <span>Online + On-site</span>
+                              <span>{workshop.location || "Online + On-site"}</span>
                             </div>
                           </div>
                         </div>
                         
                         <div className="flex items-center space-x-4">
                           <div className="text-right">
-                            <div className="text-lg font-semibold text-primary">₹{parseInt(workshop.price).toLocaleString()}</div>
+                            <div className="text-lg font-semibold text-primary">
+                              {workshop.price ? `₹${workshop.price.toLocaleString()}` : "Free"}
+                            </div>
                             <div className="text-sm text-muted-foreground">
-                              {workshop.registeredCount}/{workshop.maxParticipants || 'Unlimited'} registered
+                              Limited seats available
                             </div>
                           </div>
                           <Button
@@ -176,6 +146,12 @@ export default function WorkshopsSection() {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No upcoming workshops available at the moment.</p>
+                <p className="text-sm text-muted-foreground mt-2">Check back soon for new workshop announcements!</p>
               </div>
             )}
 
