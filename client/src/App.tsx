@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
+import { ThemeProvider } from "@/components/theme-provider";
 import { ProtectedRoute } from "@/lib/protected-route";
 import HomePage from "@/pages/home-page";
 import AdminPage from "@/pages/admin-page";
@@ -24,12 +25,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <Toaster />
-          <Router />
-        </AuthProvider>
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="light" storageKey="careermentoria-ui-theme">
+        <TooltipProvider>
+          <AuthProvider>
+            <Toaster />
+            <Router />
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
