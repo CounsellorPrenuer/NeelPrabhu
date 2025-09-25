@@ -67,9 +67,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/content-sections/:id", requireAuth, async (req, res) => {
     try {
-      const section = await storage.updateContentSection(req.params.id, req.body);
+      const validatedData = insertContentSectionSchema.parse(req.body);
+      const section = await storage.updateContentSection(req.params.id, validatedData);
       res.json(section);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to update content section" });
     }
   });
@@ -110,9 +114,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/services/:id", requireAuth, async (req, res) => {
     try {
-      const service = await storage.updateService(req.params.id, req.body);
+      const validatedData = insertServiceSchema.parse(req.body);
+      const service = await storage.updateService(req.params.id, validatedData);
       res.json(service);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to update service" });
     }
   });
@@ -153,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/testimonials/:id", requireAuth, async (req, res) => {
     try {
-      const validatedData = insertTestimonialSchema.omit({ id: true }).parse(req.body);
+      const validatedData = insertTestimonialSchema.parse(req.body);
       const testimonial = await storage.updateTestimonial(req.params.id, validatedData);
       res.json(testimonial);
     } catch (error) {
@@ -212,7 +220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/blog-posts/:id", requireAuth, async (req, res) => {
     try {
-      const validatedData = insertBlogPostSchema.omit({ id: true }).parse(req.body);
+      const validatedData = insertBlogPostSchema.parse(req.body);
       const post = await storage.updateBlogPost(req.params.id, validatedData);
       res.json(post);
     } catch (error) {
@@ -259,9 +267,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/workshops/:id", requireAuth, async (req, res) => {
     try {
-      const workshop = await storage.updateWorkshop(req.params.id, req.body);
+      const validatedData = insertWorkshopSchema.parse(req.body);
+      const workshop = await storage.updateWorkshop(req.params.id, validatedData);
       res.json(workshop);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to update workshop" });
     }
   });
