@@ -61,9 +61,9 @@ export default function AdminPage() {
               <BarChart3 className="w-4 h-4" />
               <span>Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center space-x-2">
-              <FileText className="w-4 h-4" />
-              <span>Content</span>
+            <TabsTrigger value="contact" className="flex items-center space-x-2">
+              <MessageSquare className="w-4 h-4" />
+              <span>Contact</span>
             </TabsTrigger>
             <TabsTrigger value="services" className="flex items-center space-x-2">
               <Users className="w-4 h-4" />
@@ -135,8 +135,8 @@ export default function AdminPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="content">
-            <ContentManager section="content" />
+          <TabsContent value="contact">
+            <ContentManager section="contact" />
           </TabsContent>
 
           <TabsContent value="services">

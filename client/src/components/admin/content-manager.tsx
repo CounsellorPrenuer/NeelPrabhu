@@ -18,6 +18,7 @@ import {
   Testimonial, 
   BlogPost, 
   Workshop, 
+  ContactInquiry,
   InsertService, 
   InsertTestimonial, 
   InsertBlogPost, 
@@ -25,7 +26,7 @@ import {
 } from "@shared/schema";
 
 interface ContentManagerProps {
-  section: "services" | "testimonials" | "blog" | "workshops" | "content";
+  section: "services" | "testimonials" | "blog" | "workshops" | "contact";
 }
 
 export default function ContentManager({ section }: ContentManagerProps) {
@@ -40,7 +41,8 @@ export default function ContentManager({ section }: ContentManagerProps) {
       case "testimonials": return "/api/testimonials";
       case "blog": return "/api/blog-posts";
       case "workshops": return "/api/workshops";
-      default: return "/api/content-sections";
+      case "contact": return "/api/contact-inquiries";
+      default: throw new Error(`Unknown section: ${section}`);
     }
   };
 
@@ -293,7 +295,76 @@ export default function ContentManager({ section }: ContentManagerProps) {
     }
   };
 
+  const renderContactInquiryCard = (inquiry: ContactInquiry) => {
+    const updateInquiryStatus = useMutation({
+      mutationFn: async ({ id, status }: { id: string; status: string }) => {
+        const response = await apiRequest("PUT", `/api/contact-inquiries/${id}`, { status });
+        return response.json();
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [getQueryKey()] });
+        toast({ title: "Status updated successfully" });
+      },
+      onError: (error: Error) => {
+        toast({ title: "Failed to update status", description: error.message, variant: "destructive" });
+      },
+    });
+
+    return (
+      <Card key={inquiry.id} className="relative">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="text-lg">
+                {inquiry.firstName} {inquiry.lastName}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">{inquiry.email}</p>
+              {inquiry.phone && (
+                <p className="text-sm text-muted-foreground">{inquiry.phone}</p>
+              )}
+            </div>
+            <div className="flex items-center space-x-2">
+              {inquiry.category && (
+                <Badge variant="secondary">{inquiry.category}</Badge>
+              )}
+              <Select
+                value={inquiry.status}
+                onValueChange={(status) => updateInquiryStatus.mutate({ id: inquiry.id, status })}
+                data-testid={`select-status-${inquiry.id}`}
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="contacted">Contacted</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-3">{inquiry.message}</p>
+          {inquiry.service && (
+            <p className="text-sm text-muted-foreground mb-2">
+              <strong>Interested in:</strong> {inquiry.service}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Received: {new Date(inquiry.createdAt).toLocaleString()}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  };
+
   const renderItemCard = (item: any) => {
+    // Special handling for contact inquiries
+    if (section === "contact") {
+      return renderContactInquiryCard(item);
+    }
+
     const isActive = item.isActive || item.isPublished;
     
     return (
@@ -360,41 +431,45 @@ export default function ContentManager({ section }: ContentManagerProps) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold capitalize">{section} Management</h3>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => openDialog()} data-testid={`button-add-${section}`}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add {section.slice(0, -1)}
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingItem ? "Edit" : "Create"} {section.slice(0, -1)}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {renderFormFields()}
-              <div className="flex justify-end space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createMutation.isPending || updateMutation.isPending}
-                  data-testid={`button-save-${section}`}
-                >
-                  {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <h3 className="text-2xl font-bold capitalize">
+          {section === "contact" ? "Contact Inquiries" : `${section} Management`}
+        </h3>
+        {section !== "contact" && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => openDialog()} data-testid={`button-add-${section}`}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add {section.slice(0, -1)}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingItem ? "Edit" : "Create"} {section.slice(0, -1)}
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {renderFormFields()}
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={createMutation.isPending || updateMutation.isPending}
+                    data-testid={`button-save-${section}`}
+                  >
+                    {createMutation.isPending || updateMutation.isPending ? "Saving..." : "Save"}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -403,7 +478,11 @@ export default function ContentManager({ section }: ContentManagerProps) {
 
       {items.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No {section} found. Create your first one!</p>
+          <p className="text-muted-foreground">
+            {section === "contact" 
+              ? "No contact inquiries yet. Customer inquiries from the contact form will appear here." 
+              : `No ${section} found. Create your first one!`}
+          </p>
         </div>
       )}
     </div>
