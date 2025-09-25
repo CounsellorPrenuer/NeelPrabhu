@@ -1,11 +1,16 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Shield, Receipt, Headphones, GraduationCap, Briefcase } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check, Shield, Receipt, Headphones, GraduationCap, Briefcase, CreditCard } from "lucide-react";
 import { Service } from "@shared/schema";
 import { initiatePayment } from "@/lib/payment";
-import { MotionDiv, fadeInUp } from "@/components/ui/motion"
+import { MotionDiv, fadeInUp } from "@/components/ui/motion";
+import { useToast } from "@/hooks/use-toast";
 
 export default function PricingSection() {
   const { data: services = [], isLoading } = useQuery<Service[]>({
@@ -17,6 +22,15 @@ export default function PricingSection() {
     },
   });
 
+  const { toast } = useToast();
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [paymentForm, setPaymentForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
@@ -24,16 +38,40 @@ export default function PricingSection() {
     }
   };
   
-  const handlePayment = async (service: Service) => {
+  const handlePayment = (service: Service) => {
+    setSelectedService(service);
+    setPaymentForm({ name: "", email: "", phone: "" });
+    setIsPaymentModalOpen(true);
+  };
+
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedService || !paymentForm.name || !paymentForm.email) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
+      setIsPaymentModalOpen(false);
       await initiatePayment({
-        serviceId: service.id,
-        customerName: "",
-        customerEmail: "",
-        customerPhone: "",
+        serviceId: selectedService.id,
+        customerName: paymentForm.name,
+        customerEmail: paymentForm.email,
+        customerPhone: paymentForm.phone,
+        itemType: 'service'
       });
     } catch (error) {
       console.error("Payment failed:", error);
+      toast({
+        title: "Payment Failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -160,7 +198,7 @@ export default function PricingSection() {
                           <div key={idx} className="flex items-start space-x-3">
                             <Check className={`w-4 h-4 mt-1 flex-shrink-0 ${getCheckIconColor(service.category)}`} />
                             <span className="text-sm text-muted-foreground leading-relaxed">
-                              {String(feature)}
+                              {feature}
                             </span>
                           </div>
                         ))}
@@ -214,6 +252,87 @@ export default function PricingSection() {
           </div>
         </MotionDiv>
       </div>
+
+      {/* Service Payment Modal */}
+      <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Plan Registration</DialogTitle>
+          </DialogHeader>
+          
+          {selectedService && (
+            <div className="space-y-4">
+              <div className="p-4 bg-primary/5 rounded-lg">
+                <h4 className="font-semibold text-foreground">{selectedService.name}</h4>
+                <p className="text-sm text-muted-foreground">{selectedService.description}</p>
+                <div className="text-lg font-semibold text-primary mt-2">
+                  ₹{selectedService.price?.toLocaleString()}
+                </div>
+              </div>
+
+              <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="service-payment-name">Full Name *</Label>
+                  <Input
+                    id="service-payment-name"
+                    type="text"
+                    required
+                    value={paymentForm.name}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter your full name"
+                    data-testid="input-service-payment-name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="service-payment-email">Email Address *</Label>
+                  <Input
+                    id="service-payment-email"
+                    type="email"
+                    required
+                    value={paymentForm.email}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Enter your email address"
+                    data-testid="input-service-payment-email"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="service-payment-phone">Phone Number</Label>
+                  <Input
+                    id="service-payment-phone"
+                    type="tel"
+                    value={paymentForm.phone}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="Enter your phone number (optional)"
+                    data-testid="input-service-payment-phone"
+                  />
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsPaymentModalOpen(false)}
+                    className="flex-1"
+                    data-testid="button-cancel-service-payment"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                    data-testid="button-proceed-service-payment"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Pay ₹{selectedService.price?.toLocaleString()}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
