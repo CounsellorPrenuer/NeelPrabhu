@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Calendar, Clock, MapPin, Users, School, Building, BookOpen, Target, Lightbulb, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { MotionSection, MotionDiv, MotionCard, MotionStagger, fadeInUp, fadeInLeft, fadeInRight, staggerContainer, scaleIn } from "@/components/ui/motion";
@@ -33,6 +37,13 @@ export default function WorkshopsSection() {
   });
 
   const { toast } = useToast();
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
+  const [paymentForm, setPaymentForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -41,42 +52,52 @@ export default function WorkshopsSection() {
     }
   };
 
-  const handleWorkshopRegistration = async (workshop: Workshop) => {
+  const handleWorkshopRegistration = (workshop: Workshop) => {
     // If workshop has an external registration URL, use that
     if (workshop.registrationUrl) {
       window.open(workshop.registrationUrl, '_blank');
       return;
     }
 
-    // If workshop has a price, initiate payment
+    // If workshop has a price, open payment modal
     if (workshop.price && workshop.price > 0) {
-      const customerName = prompt("Please enter your full name:");
-      if (!customerName) return;
-      
-      const customerEmail = prompt("Please enter your email address:");
-      if (!customerEmail) return;
-      
-      const customerPhone = prompt("Please enter your phone number (optional):");
-
-      try {
-        await initiatePayment({
-          workshopId: workshop.id,
-          customerName,
-          customerEmail,
-          customerPhone: customerPhone || "",
-          itemType: 'workshop'
-        });
-      } catch (error) {
-        console.error("Payment failed:", error);
-        toast({
-          title: "Payment Failed",
-          description: "There was an error processing your payment. Please try again.",
-          variant: "destructive",
-        });
-      }
+      setSelectedWorkshop(workshop);
+      setPaymentForm({ name: "", email: "", phone: "" });
+      setIsPaymentModalOpen(true);
     } else {
       // Free workshop or no price - scroll to contact
       scrollToSection('#contact');
+    }
+  };
+
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedWorkshop || !paymentForm.name || !paymentForm.email) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsPaymentModalOpen(false);
+      await initiatePayment({
+        workshopId: selectedWorkshop.id,
+        customerName: paymentForm.name,
+        customerEmail: paymentForm.email,
+        customerPhone: paymentForm.phone,
+        itemType: 'workshop'
+      });
+    } catch (error) {
+      console.error("Payment failed:", error);
+      toast({
+        title: "Payment Failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -345,6 +366,87 @@ export default function WorkshopsSection() {
           </div>
         </MotionDiv>
       </div>
+
+      {/* Workshop Payment Modal */}
+      <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Workshop Registration</DialogTitle>
+          </DialogHeader>
+          
+          {selectedWorkshop && (
+            <div className="space-y-4">
+              <div className="p-4 bg-primary/5 rounded-lg">
+                <h4 className="font-semibold text-foreground">{selectedWorkshop.title}</h4>
+                <p className="text-sm text-muted-foreground">{selectedWorkshop.description}</p>
+                <div className="text-lg font-semibold text-primary mt-2">
+                  ₹{selectedWorkshop.price}
+                </div>
+              </div>
+
+              <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="payment-name">Full Name *</Label>
+                  <Input
+                    id="payment-name"
+                    type="text"
+                    required
+                    value={paymentForm.name}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter your full name"
+                    data-testid="input-payment-name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="payment-email">Email Address *</Label>
+                  <Input
+                    id="payment-email"
+                    type="email"
+                    required
+                    value={paymentForm.email}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="Enter your email address"
+                    data-testid="input-payment-email"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="payment-phone">Phone Number</Label>
+                  <Input
+                    id="payment-phone"
+                    type="tel"
+                    value={paymentForm.phone}
+                    onChange={(e) => setPaymentForm(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="Enter your phone number (optional)"
+                    data-testid="input-payment-phone"
+                  />
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsPaymentModalOpen(false)}
+                    className="flex-1"
+                    data-testid="button-cancel-payment"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                    data-testid="button-proceed-payment"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Pay ₹{selectedWorkshop.price}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </MotionSection>
   );
 }

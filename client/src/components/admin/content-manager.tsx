@@ -13,16 +13,16 @@ import { useForm } from "react-hook-form";
 import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Service, 
-  Testimonial, 
-  BlogPost, 
-  Workshop, 
+import {
+  Service,
+  Testimonial,
+  BlogPost,
+  Workshop,
   ContactInquiry,
-  InsertService, 
-  InsertTestimonial, 
-  InsertBlogPost, 
-  InsertWorkshop 
+  InsertService,
+  InsertTestimonial,
+  InsertBlogPost,
+  InsertWorkshop
 } from "@shared/schema";
 
 interface ContentManagerProps {
@@ -100,6 +100,21 @@ export default function ContentManager({ section }: ContentManagerProps) {
     },
   });
 
+  // FIX: Moved the mutation hook to the top level of the component.
+  const updateInquiryStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const response = await apiRequest("PUT", `/api/contact-inquiries/${id}`, { status });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [getQueryKey()] });
+      toast({ title: "Status updated successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to update status", description: error.message, variant: "destructive" });
+    },
+  });
+
   const { register, handleSubmit, reset, setValue, watch } = useForm();
 
   const onSubmit = (data: any) => {
@@ -155,8 +170,8 @@ export default function ContentManager({ section }: ContentManagerProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="features">Features (comma-separated)</Label>
-              <Textarea 
-                id="features" 
+              <Textarea
+                id="features"
                 placeholder="Feature 1, Feature 2, Feature 3"
                 {...register("features", {
                   setValueAs: (value) => {
@@ -269,7 +284,13 @@ export default function ContentManager({ section }: ContentManagerProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="date">Date & Time</Label>
-              <Input id="date" type="datetime-local" {...register("date")} />
+              <Input 
+                id="date" 
+                type="datetime-local" 
+                {...register("date", {
+                  setValueAs: (value) => value ? new Date(value) : null
+                })} 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
@@ -352,7 +373,7 @@ export default function ContentManager({ section }: ContentManagerProps) {
             </p>
           )}
           <p className="text-xs text-muted-foreground">
-            Received: {new Date(inquiry.createdAt).toLocaleString()}
+            Received: {inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : 'Unknown'}
           </p>
         </CardContent>
       </Card>
@@ -366,7 +387,7 @@ export default function ContentManager({ section }: ContentManagerProps) {
     }
 
     const isActive = item.isActive || item.isPublished;
-    
+
     return (
       <Card key={item.id} className="relative">
         <CardHeader className="pb-3">
@@ -398,7 +419,7 @@ export default function ContentManager({ section }: ContentManagerProps) {
           {item.excerpt && (
             <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{item.excerpt}</p>
           )}
-          
+
           <div className="flex items-center space-x-2">
             <Button
               size="sm"
@@ -479,8 +500,8 @@ export default function ContentManager({ section }: ContentManagerProps) {
       {items.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
-            {section === "contact" 
-              ? "No contact inquiries yet. Customer inquiries from the contact form will appear here." 
+            {section === "contact"
+              ? "No contact inquiries yet. Customer inquiries from the contact form will appear here."
               : `No ${section} found. Create your first one!`}
           </p>
         </div>
