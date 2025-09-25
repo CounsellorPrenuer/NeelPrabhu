@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Clock, MapPin, Users, School, Building, BookOpen, Target, Lightbulb } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, School, Building, BookOpen, Target, Lightbulb, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
 import { MotionSection, MotionDiv, MotionCard, MotionStagger, fadeInUp, fadeInLeft, fadeInRight, staggerContainer, scaleIn } from "@/components/ui/motion";
 import { Workshop } from "@shared/schema";
+import { initiatePayment } from "@/lib/payment";
+import { useToast } from "@/hooks/use-toast";
 
 const categoryIcons = {
   schools: School,
@@ -30,10 +32,51 @@ export default function WorkshopsSection() {
     },
   });
 
+  const { toast } = useToast();
+
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleWorkshopRegistration = async (workshop: Workshop) => {
+    // If workshop has an external registration URL, use that
+    if (workshop.registrationUrl) {
+      window.open(workshop.registrationUrl, '_blank');
+      return;
+    }
+
+    // If workshop has a price, initiate payment
+    if (workshop.price && workshop.price > 0) {
+      const customerName = prompt("Please enter your full name:");
+      if (!customerName) return;
+      
+      const customerEmail = prompt("Please enter your email address:");
+      if (!customerEmail) return;
+      
+      const customerPhone = prompt("Please enter your phone number (optional):");
+
+      try {
+        await initiatePayment({
+          workshopId: workshop.id,
+          customerName,
+          customerEmail,
+          customerPhone: customerPhone || "",
+          itemType: 'workshop'
+        });
+      } catch (error) {
+        console.error("Payment failed:", error);
+        toast({
+          title: "Payment Failed",
+          description: "There was an error processing your payment. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      // Free workshop or no price - scroll to contact
+      scrollToSection('#contact');
     }
   };
 
@@ -244,10 +287,17 @@ export default function WorkshopsSection() {
                       )}
                       <Button
                         className="bg-primary text-primary-foreground hover:bg-primary/90"
-                        onClick={() => workshop.registrationUrl ? window.open(workshop.registrationUrl, '_blank') : scrollToSection('#contact')}
+                        onClick={() => handleWorkshopRegistration(workshop)}
                         data-testid={`button-register-${workshop.id}`}
                       >
-                        Register Now
+                        {workshop.price && workshop.price > 0 ? (
+                          <>
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            Pay ₹{workshop.price}
+                          </>
+                        ) : (
+                          "Register Now"
+                        )}
                       </Button>
                     </div>
                   </div>

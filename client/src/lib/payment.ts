@@ -7,10 +7,12 @@ declare global {
 }
 
 interface PaymentData {
-  serviceId: string;
+  serviceId?: string;
+  workshopId?: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  itemType: 'service' | 'workshop';
 }
 
 interface RazorpayOptions {
@@ -63,7 +65,7 @@ export async function initiatePayment(paymentData: PaymentData) {
       amount: orderData.amount,
       currency: orderData.currency,
       name: "CareerMentoria",
-      description: "Career Guidance Service",
+      description: paymentData.workshopId ? "Workshop Registration" : "Career Guidance Service",
       order_id: orderData.orderId,
       handler: async function (response: any) {
         try {
