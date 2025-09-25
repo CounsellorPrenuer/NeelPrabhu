@@ -193,7 +193,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateTestimonial(id: string, testimonial: Partial<InsertTestimonial>): Promise<Testimonial> {
     const [updated] = await db.update(testimonials)
-      .set(testimonial)
+      .set({ ...testimonial, updatedAt: new Date() })
       .where(eq(testimonials.id, id))
       .returning();
     return updated;

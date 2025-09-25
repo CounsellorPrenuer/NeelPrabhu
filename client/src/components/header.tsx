@@ -6,9 +6,8 @@ import logoImage from "@assets/Careermentoria Logo with Compass Icon - Neel Prab
 const navigationItems = [
   { href: "#home", label: "Home" },
   { href: "#about", label: "About Neel Prabhu" },
-  { href: "#services", label: "Services" },
+  { href: "#pricing", label: "Services" }, // Points to pricing section as requested
   { href: "#workshops", label: "Workshops" },
-  { href: "#blog", label: "Resources" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "#contact", label: "Contact" },
 ];
@@ -64,7 +63,7 @@ export default function Header() {
               Book a Free Career Call
             </Button>
             <Button
-              onClick={() => scrollToSection('#services')}
+              onClick={() => scrollToSection('#pricing')}
               variant="outline"
               data-testid="button-explore-services"
             >
@@ -111,7 +110,7 @@ export default function Header() {
                   Book a Free Career Call
                 </Button>
                 <Button
-                  onClick={() => scrollToSection('#services')}
+                  onClick={() => scrollToSection('#pricing')}
                   variant="outline"
                   data-testid="mobile-button-explore-services"
                 >

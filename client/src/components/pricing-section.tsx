@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Shield, Receipt, Headphones, GraduationCap, Briefcase } from "lucide-react";
 import { Service } from "@shared/schema";
 import { initiatePayment } from "@/lib/payment";
+import { MotionDiv, fadeInUp } from "@/components/ui/motion"
 
 export default function PricingSection() {
   const { data: services = [], isLoading } = useQuery<Service[]>({
@@ -16,6 +17,13 @@ export default function PricingSection() {
     },
   });
 
+  const scrollToSection = (href: string) => {
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+  
   const handlePayment = async (service: Service) => {
     try {
       await initiatePayment({
@@ -179,31 +187,32 @@ export default function PricingSection() {
             </div>
           </div>
         )}
-
-        {/* Payment Processing Note */}
-        <div className="bg-muted/50 rounded-xl p-6 text-center max-w-2xl mx-auto">
-          <div className="flex items-center justify-center space-x-2 mb-2">
-            <Shield className="w-5 h-5 text-primary" />
-            <span className="font-semibold text-foreground">Secure Payment Processing</span>
+        {/* Bottom CTA Section */}
+        <MotionDiv 
+          className="mt-16 text-center"
+          variants={fadeInUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <div className="glass-card p-8 rounded-2xl max-w-2xl mx-auto">
+            <h3 className="text-fluid-xl font-bold text-foreground mb-4">
+              Not sure which service is right for you?
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Book a free discovery call to discuss your goals and find the perfect career guidance solution.
+            </p>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-primary/20 px-8 py-4 rounded-xl interactive-scale"
+              onClick={() => scrollToSection('#contact')}
+              data-testid="button-free-consultation"
+            >
+              Book Free Consultation
+            </Button>
           </div>
-          <p className="text-muted-foreground mb-4">
-            All payments are processed securely through Razorpay. You'll receive a confirmation email and receipt after successful payment.
-          </p>
-          <div className="flex items-center justify-center space-x-6 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-primary" />
-              <span>Secure payments</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Receipt className="w-4 h-4 text-primary" />
-              <span>Instant receipts</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Headphones className="w-4 h-4 text-primary" />
-              <span>24/7 support</span>
-            </div>
-          </div>
-        </div>
+        </MotionDiv>
       </div>
     </section>
   );

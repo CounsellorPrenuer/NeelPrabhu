@@ -157,7 +157,13 @@ export default function ContentManager({ section }: ContentManagerProps) {
                 id="features" 
                 placeholder="Feature 1, Feature 2, Feature 3"
                 {...register("features", {
-                  setValueAs: (value) => value ? value.split(',').map((f: string) => f.trim()) : []
+                  setValueAs: (value) => {
+                    // Handle both string and array values safely
+                    if (!value) return [];
+                    if (Array.isArray(value)) return value;
+                    if (typeof value === 'string') return value.split(',').map((f: string) => f.trim());
+                    return [];
+                  }
                 })}
               />
             </div>

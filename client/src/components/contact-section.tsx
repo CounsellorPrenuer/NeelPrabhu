@@ -309,16 +309,7 @@ export default function ContactSection() {
                       )}
                     </div>
 
-                    <div className="flex items-start space-x-3">
-                      <Checkbox
-                        id="privacy"
-                        onCheckedChange={(checked) => setValue("privacy", !!checked)}
-                        data-testid="checkbox-privacy"
-                      />
-                      <Label htmlFor="privacy" className="text-sm text-muted-foreground leading-relaxed">
-                        I agree to the Privacy Policy and Terms of Service *
-                      </Label>
-                    </div>
+                  
                     {errors.privacy && (
                       <p className="text-sm text-destructive">{errors.privacy.message}</p>
                     )}

@@ -19,7 +19,7 @@ export default function HomePage() {
         <main className="relative overflow-hidden">
           <HeroSection />
           <AboutSection />
-          <ServicesSection />
+          {/* <ServicesSection /> */}
           <PricingSection />
           <TestimonialsSection />
           <BlogSection />

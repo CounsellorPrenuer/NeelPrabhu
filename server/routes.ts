@@ -153,9 +153,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/testimonials/:id", requireAuth, async (req, res) => {
     try {
-      const testimonial = await storage.updateTestimonial(req.params.id, req.body);
+      const validatedData = insertTestimonialSchema.omit({ id: true }).parse(req.body);
+      const testimonial = await storage.updateTestimonial(req.params.id, validatedData);
       res.json(testimonial);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to update testimonial" });
     }
   });
@@ -208,9 +212,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/blog-posts/:id", requireAuth, async (req, res) => {
     try {
-      const post = await storage.updateBlogPost(req.params.id, req.body);
+      const validatedData = insertBlogPostSchema.omit({ id: true }).parse(req.body);
+      const post = await storage.updateBlogPost(req.params.id, validatedData);
       res.json(post);
     } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: "Invalid data", errors: error.errors });
+      }
       res.status(500).json({ message: "Failed to update blog post" });
     }
   });

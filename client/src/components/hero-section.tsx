@@ -126,7 +126,7 @@ export default function HeroSection() {
                 onClick={() => scrollToSection('#services')}
                 size="lg"
                 variant="outline"
-                className="glass-card border-primary/20 hover:bg-primary/5 px-8 py-4 text-lg font-semibold rounded-2xl interactive-scale"
+                className="glass-card border-primary/20 px-8 py-4 text-lg font-semibold rounded-2xl interactive-scale"
                 data-testid="button-explore-services-hero"
               >
                 Explore Our Services

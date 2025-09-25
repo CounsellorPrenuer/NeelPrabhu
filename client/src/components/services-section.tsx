@@ -155,32 +155,7 @@ export default function ServicesSection() {
           </div>
         </MotionStagger>
 
-        {/* Bottom CTA Section */}
-        <MotionDiv 
-          className="mt-16 text-center"
-          variants={fadeInUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <div className="glass-card p-8 rounded-2xl max-w-2xl mx-auto">
-            <h3 className="text-fluid-xl font-bold text-foreground mb-4">
-              Not sure which service is right for you?
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Book a free discovery call to discuss your goals and find the perfect career guidance solution.
-            </p>
-            <Button 
-              size="lg" 
-              variant="outline"
-              className="border-primary/20 hover:bg-primary/5 px-8 py-4 rounded-xl interactive-scale"
-              onClick={() => scrollToSection('#contact')}
-              data-testid="button-free-consultation"
-            >
-              Book Free Consultation
-            </Button>
-          </div>
-        </MotionDiv>
+       
       </div>
     </MotionSection>
   );
