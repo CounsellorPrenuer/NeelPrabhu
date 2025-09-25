@@ -317,20 +317,6 @@ export default function ContentManager({ section }: ContentManagerProps) {
   };
 
   const renderContactInquiryCard = (inquiry: ContactInquiry) => {
-    const updateInquiryStatus = useMutation({
-      mutationFn: async ({ id, status }: { id: string; status: string }) => {
-        const response = await apiRequest("PUT", `/api/contact-inquiries/${id}`, { status });
-        return response.json();
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [getQueryKey()] });
-        toast({ title: "Status updated successfully" });
-      },
-      onError: (error: Error) => {
-        toast({ title: "Failed to update status", description: error.message, variant: "destructive" });
-      },
-    });
-
     return (
       <Card key={inquiry.id} className="relative">
         <CardHeader className="pb-3">
