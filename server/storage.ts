@@ -71,6 +71,7 @@ export interface IStorage {
   // Workshop methods
   getWorkshops(): Promise<Workshop[]>;
   getActiveWorkshops(): Promise<Workshop[]>;
+  getWorkshop(id: string): Promise<Workshop | undefined>;
   createWorkshop(workshop: InsertWorkshop): Promise<Workshop>;
   updateWorkshop(id: string, workshop: Partial<InsertWorkshop>): Promise<Workshop>;
   deleteWorkshop(id: string): Promise<void>;
@@ -245,6 +246,12 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(workshops)
       .where(eq(workshops.isActive, true))
       .orderBy(workshops.date);
+  }
+
+  async getWorkshop(id: string): Promise<Workshop | undefined> {
+    const [workshop] = await db.select().from(workshops)
+      .where(eq(workshops.id, id));
+    return workshop;
   }
 
   async createWorkshop(workshop: InsertWorkshop): Promise<Workshop> {

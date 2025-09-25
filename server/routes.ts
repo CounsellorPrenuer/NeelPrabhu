@@ -331,30 +331,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/create-order", async (req, res) => {
     try {
-      const { serviceId, customerEmail, customerName, customerPhone } = req.body;
+      const { serviceId, workshopId, customerEmail, customerName, customerPhone, itemType } = req.body;
       
-      const service = await storage.getService(serviceId);
-      if (!service) {
-        return res.status(404).json({ message: "Service not found" });
+      let item;
+      let amount;
+      let itemDescription;
+
+      // Handle workshop payments
+      if (itemType === 'workshop' && workshopId) {
+        item = await storage.getWorkshop(workshopId);
+        if (!item) {
+          return res.status(404).json({ message: "Workshop not found" });
+        }
+        amount = item.price;
+        itemDescription = `Workshop: ${item.title}`;
+      } else {
+        // Handle service payments
+        item = await storage.getService(serviceId);
+        if (!item) {
+          return res.status(404).json({ message: "Service not found" });
+        }
+        amount = item.price;
+        itemDescription = `Service: ${item.name}`;
+      }
+
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ message: "Invalid amount" });
       }
 
       const options = {
-        amount: (service.price || 0) * 100, // amount in paisa
+        amount: amount * 100, // amount in paisa
         currency: "INR",
-        receipt: `receipt_${Date.now()}`,
+        receipt: `${itemType || 'service'}_${Date.now()}`,
       };
 
       const razorpayOrder = await razorpay.orders.create(options);
 
+      // Store order with workshop info in receipt field for workshops
       const paymentOrder = await storage.createPaymentOrder({
         razorpayOrderId: razorpayOrder.id,
-        amount: service.price || 0,
+        amount,
         currency: "INR",
-        serviceId,
+        serviceId: itemType === 'workshop' ? null : serviceId,
         customerEmail,
         customerName,
         customerPhone,
-        receipt: options.receipt,
+        receipt: itemType === 'workshop' ? JSON.stringify({ workshopId, workshopTitle: item.title }) : options.receipt,
       });
 
       res.json({

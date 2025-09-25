@@ -89,21 +89,6 @@ export default function MentoriaSection() {
             </div>
 
             <div className="space-y-8">
-              {/* Platform showcase image placeholder */}
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="h-80 bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                    <div className="text-center text-white/80">
-                      <div className="w-24 h-24 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
-                        <Award className="w-12 h-12" />
-                      </div>
-                      <h4 className="text-lg font-semibold mb-2">Mentoria Platform Interface</h4>
-                      <p className="text-sm">Comprehensive career discovery tools and resources</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               <div className="space-y-6">
                 <div>
                   <h3 className="text-2xl font-bold text-white mb-4">Platform Benefits</h3>

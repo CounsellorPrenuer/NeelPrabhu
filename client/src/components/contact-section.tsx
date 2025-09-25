@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,7 +22,6 @@ const contactSchema = z.object({
   category: z.string().min(1, "Please select a category"),
   service: z.string().optional(),
   message: z.string().min(10, "Message must be at least 10 characters"),
-  privacy: z.boolean().refine(val => val, "You must accept the privacy policy"),
 });
 
 type ContactForm = z.infer<typeof contactSchema>;
@@ -32,14 +30,7 @@ export default function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch,
-    reset,
-  } = useForm<ContactForm>({
+  const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       firstName: "",
@@ -49,7 +40,6 @@ export default function ContactSection() {
       category: "",
       service: "",
       message: "",
-      privacy: false,
     },
   });
 
@@ -76,15 +66,12 @@ export default function ContactSection() {
   });
 
   const onSubmit = (data: ContactForm) => {
-    const { privacy, ...inquiryData } = data;
-    contactMutation.mutate(inquiryData);
+    contactMutation.mutate(data);
   };
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -159,31 +146,13 @@ export default function ContactSection() {
                 <CardContent className="p-6">
                   <h4 className="font-semibold text-foreground mb-4">Follow Us</h4>
                   <div className="flex space-x-4">
-                    <a
-                      href="https://linkedin.com/in/neel-prabhu"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                      data-testid="link-linkedin"
-                    >
+                    <a href="https://linkedin.com/in/neel-prabhu" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                       <Linkedin className="w-5 h-5" />
                     </a>
-                    <a
-                      href="#"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                      data-testid="link-instagram"
-                    >
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                       <Instagram className="w-5 h-5" />
                     </a>
-                    <a
-                      href="#"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
-                      data-testid="link-twitter"
-                    >
+                    <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                       <Twitter className="w-5 h-5" />
                     </a>
                   </div>
@@ -208,58 +177,31 @@ export default function ContactSection() {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName">First Name *</Label>
-                        <Input
-                          id="firstName"
-                          {...register("firstName")}
-                          className={errors.firstName ? "border-destructive" : ""}
-                          data-testid="input-first-name"
-                        />
-                        {errors.firstName && (
-                          <p className="text-sm text-destructive">{errors.firstName.message}</p>
-                        )}
+                        <Input id="firstName" {...register("firstName")} className={errors.firstName ? "border-destructive" : ""} />
+                        {errors.firstName && <p className="text-sm text-destructive">{errors.firstName.message}</p>}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="lastName">Last Name *</Label>
-                        <Input
-                          id="lastName"
-                          {...register("lastName")}
-                          className={errors.lastName ? "border-destructive" : ""}
-                          data-testid="input-last-name"
-                        />
-                        {errors.lastName && (
-                          <p className="text-sm text-destructive">{errors.lastName.message}</p>
-                        )}
+                        <Input id="lastName" {...register("lastName")} className={errors.lastName ? "border-destructive" : ""} />
+                        {errors.lastName && <p className="text-sm text-destructive">{errors.lastName.message}</p>}
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        {...register("email")}
-                        className={errors.email ? "border-destructive" : ""}
-                        data-testid="input-email"
-                      />
-                      {errors.email && (
-                        <p className="text-sm text-destructive">{errors.email.message}</p>
-                      )}
+                      <Input id="email" type="email" {...register("email")} className={errors.email ? "border-destructive" : ""} />
+                      {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        {...register("phone")}
-                        data-testid="input-phone"
-                      />
+                      <Input id="phone" type="tel" {...register("phone")} />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="category">I am a *</Label>
                       <Select onValueChange={(value) => setValue("category", value)}>
-                        <SelectTrigger data-testid="select-category">
+                        <SelectTrigger>
                           <SelectValue placeholder="Please select..." />
                         </SelectTrigger>
                         <SelectContent>
@@ -271,15 +213,13 @@ export default function ContactSection() {
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                      {errors.category && (
-                        <p className="text-sm text-destructive">{errors.category.message}</p>
-                      )}
+                      {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="service">Interested Service</Label>
                       <Select onValueChange={(value) => setValue("service", value)}>
-                        <SelectTrigger data-testid="select-service">
+                        <SelectTrigger>
                           <SelectValue placeholder="Please select..." />
                         </SelectTrigger>
                         <SelectContent>
@@ -296,30 +236,11 @@ export default function ContactSection() {
 
                     <div className="space-y-2">
                       <Label htmlFor="message">Message *</Label>
-                      <Textarea
-                        id="message"
-                        rows={4}
-                        {...register("message")}
-                        placeholder="Tell us about your career goals, current situation, or any specific questions..."
-                        className={errors.message ? "border-destructive" : ""}
-                        data-testid="textarea-message"
-                      />
-                      {errors.message && (
-                        <p className="text-sm text-destructive">{errors.message.message}</p>
-                      )}
+                      <Textarea id="message" rows={4} {...register("message")} placeholder="Tell us about your career goals, current situation, or any specific questions..." className={errors.message ? "border-destructive" : ""} />
+                      {errors.message && <p className="text-sm text-destructive">{errors.message.message}</p>}
                     </div>
 
-                  
-                    {errors.privacy && (
-                      <p className="text-sm text-destructive">{errors.privacy.message}</p>
-                    )}
-
-                    <Button
-                      type="submit"
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                      disabled={contactMutation.isPending}
-                      data-testid="button-send-message"
-                    >
+                    <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={contactMutation.isPending}>
                       {contactMutation.isPending ? "Sending..." : "Send Message"}
                     </Button>
                   </form>
@@ -336,12 +257,7 @@ export default function ContactSection() {
                 <p className="text-muted-foreground mb-6">
                   Book a free 30-minute discovery call to discuss your career goals and how we can help.
                 </p>
-                <Button
-                  size="lg"
-                  onClick={() => scrollToSection('#contact')}
-                  className="bg-accent text-accent-foreground hover:bg-accent/90 transform hover:scale-105 transition-all"
-                  data-testid="button-book-free-call"
-                >
+                <Button size="lg" onClick={() => scrollToSection('#contact')} className="bg-accent text-accent-foreground hover:bg-accent/90 transform hover:scale-105 transition-all">
                   Book Your Free Career Call
                 </Button>
               </CardContent>
