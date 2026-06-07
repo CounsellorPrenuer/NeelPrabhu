@@ -8,13 +8,28 @@ export const sanityClient = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true,
+  useCdn: false,
   perspective: "published",
 });
 
+const imageProjection = `{
+  alt,
+  asset->{
+    _id,
+    url,
+    metadata { dimensions { width, height } }
+  }
+}`;
+
 export type SanityImageValue = {
-  asset?: { _ref?: string; _type?: string };
+  _type?: string;
   alt?: string;
+  asset?: {
+    _ref?: string;
+    _type?: string;
+    _id?: string;
+    url?: string;
+  };
 } | null;
 
 export type StandardPlan = {
@@ -75,9 +90,9 @@ export type SiteSettings = {
 
 export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{
   siteTitle,
-  logo,
-  heroPortrait,
-  aboutImage
+  logo ${imageProjection},
+  heroPortrait ${imageProjection},
+  aboutImage ${imageProjection}
 }`;
 
 export async function fetchSiteSettings() {
@@ -111,7 +126,7 @@ export async function fetchBlogPosts() {
       publishedAt,
       category,
       readTime,
-      coverImage
+      coverImage ${imageProjection}
     }`,
   );
 }
@@ -119,7 +134,7 @@ export async function fetchBlogPosts() {
 export async function fetchServices() {
   return sanityClient.fetch<ServiceItem[]>(
     `*[_type == "services"] | order(coalesce(order, 999) asc){
-      _id, title, subtitle, features, order, image
+      _id, title, subtitle, features, order, image ${imageProjection}
     }`,
   );
 }
@@ -127,7 +142,7 @@ export async function fetchServices() {
 export async function fetchTestimonials() {
   return sanityClient.fetch<TestimonialItem[]>(
     `*[_type == "testimonials"] | order(coalesce(order, 999) asc){
-      _id, name, role, achievement, quote, order, photo
+      _id, name, role, achievement, quote, order, photo ${imageProjection}
     }`,
   );
 }

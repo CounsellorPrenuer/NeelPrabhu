@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import logoImage from "@assets/Careermentoria Logo with Compass Icon - Neel Prabhu_1758711922420.png";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { urlFor } from "@/lib/sanityImage";
+import fallbackLogo from "@assets/Careermentoria Logo with Compass Icon - Neel Prabhu_1758711922420.png";
 
 const navigationItems = [
   { href: "#home", label: "Home" },
@@ -14,6 +16,8 @@ const navigationItems = [
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: settings } = useSiteSettings();
+  const logoSrc = urlFor(settings?.logo, { width: 120, height: 120 }) ?? fallbackLogo;
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -30,8 +34,8 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <img 
-              src={logoImage} 
-              alt="CareerMentoria Logo" 
+              src={logoSrc} 
+              alt={settings?.logo?.alt || "CareerMentoria Logo"} 
               className="w-10 h-10 object-contain"
               data-testid="logo-image"
             />
