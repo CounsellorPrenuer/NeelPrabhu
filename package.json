@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "vite build && copy dist\\public\\index.html dist\\public\\404.html",
+    "build:pages": "set VITE_BASE_PATH=/NeelPrabhu/&& set VITE_PROJECT_ID=NeelPrabhu&& set VITE_WORKER_BASE_URL=https://multi-tenant-platform.gauravgoodreads.workers.dev&& set VITE_SANITY_PROJECT_ID=ivm39if0&& set VITE_SANITY_DATASET=production&& vite build && copy dist\\public\\index.html dist\\public\\404.html && echo.> dist\\public\\.nojekyll",
     "start": "NODE_ENV=production node dist/index.js",
     "check": "tsc",
     "db:push": "drizzle-kit push"
@@ -41,6 +42,8 @@
     "@radix-ui/react-toggle": "^1.1.3",
     "@radix-ui/react-toggle-group": "^1.1.3",
     "@radix-ui/react-tooltip": "^1.2.0",
+    "@sanity/client": "^7.22.0",
+    "@sanity/image-url": "^1.2.0",
     "@sendgrid/mail": "^8.1.6",
     "@tanstack/react-query": "^5.60.5",
     "class-variance-authority": "^0.7.1",

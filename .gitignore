@@ -4,3 +4,10 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+.env
+.env.*
+!.env.production
+.local
+sanity-studio/.sanity
+sanity-studio/dist
+cloudflare-worker/node_modules

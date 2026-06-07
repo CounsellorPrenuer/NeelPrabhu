@@ -10,9 +10,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Phone, Mail, Globe, MapPin, Linkedin, Instagram, Twitter, CheckCircle } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { CONTACT_EMAIL, CONTACT_PHONE, PROJECT_ID, apiUrl } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
-import { InsertContactInquiry } from "@shared/schema";
 
 const contactSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -44,9 +43,37 @@ export default function ContactSection() {
   });
 
   const contactMutation = useMutation({
-    mutationFn: async (data: InsertContactInquiry) => {
-      const response = await apiRequest("POST", "/api/contact-inquiries", data);
-      return response.json();
+    mutationFn: async (data: ContactForm) => {
+      const name = `${data.firstName} ${data.lastName}`.trim();
+      const message = [
+        data.message,
+        data.category ? `Category: ${data.category}` : "",
+        data.service ? `Service: ${data.service}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      const res = await fetch(apiUrl("/api/forms/submit"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          project_id: PROJECT_ID,
+          name,
+          email: data.email,
+          phone: data.phone,
+          message,
+        }),
+      });
+
+      if (!res.ok) {
+        const subject = encodeURIComponent("Career Mentoria Inquiry");
+        const body = encodeURIComponent(
+          `Name: ${name}\nEmail: ${data.email}\nPhone: ${data.phone || "N/A"}\nCategory: ${data.category}\nService: ${data.service || "N/A"}\n\n${data.message}`,
+        );
+        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+        return { fallback: true };
+      }
+      return res.json();
     },
     onSuccess: () => {
       setIsSubmitted(true);
@@ -101,7 +128,7 @@ export default function ContactSection() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground">Phone</h4>
-                      <p className="text-muted-foreground">+91 9921193333</p>
+                      <p className="text-muted-foreground">{CONTACT_PHONE}</p>
                       <p className="text-sm text-muted-foreground">Available Mon-Sat, 9 AM - 6 PM IST</p>
                     </div>
                   </div>
@@ -112,7 +139,7 @@ export default function ContactSection() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground">Email</h4>
-                      <p className="text-muted-foreground">neelprabhu3@gmail.com</p>
+                      <p className="text-muted-foreground">{CONTACT_EMAIL}</p>
                       <p className="text-sm text-muted-foreground">Response within 24 hours</p>
                     </div>
                   </div>

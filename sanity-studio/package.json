@@ -1,0 +1,13 @@
+{
+  "name": "neelprabhu-sanity-studio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "sanity": "^5.26.0",
+    "styled-components": "^6.4.2"
+  }
+}

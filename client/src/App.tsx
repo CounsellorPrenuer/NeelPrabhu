@@ -1,22 +1,16 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ProtectedRoute } from "@/lib/protected-route";
 import HomePage from "@/pages/home-page";
-import AdminPage from "@/pages/admin-page";
-import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
-      <Route path="/auth" component={AuthPage} />
-      <ProtectedRoute path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -27,10 +21,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="careermentoria-ui-theme">
         <TooltipProvider>
-          <AuthProvider>
+          <WouterRouter base={import.meta.env.BASE_URL}>
             <Toaster />
             <Router />
-          </AuthProvider>
+          </WouterRouter>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

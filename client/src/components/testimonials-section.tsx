@@ -6,17 +6,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Star, ChevronLeft, ChevronRight, Quote, Users, TrendingUp, Award } from "lucide-react";
 import { motion } from "framer-motion";
 import { MotionSection, MotionDiv, MotionCard, MotionStagger, fadeInUp, fadeInLeft, fadeInRight, staggerContainer, scaleIn } from "@/components/ui/motion";
-import { Testimonial } from "@shared/schema";
+import { TestimonialItem, fetchTestimonials } from "@/lib/sanity";
+import { urlFor } from "@/lib/sanityImage";
 import { useState, useEffect } from "react";
 
 export default function TestimonialsSection() {
-  const { data: testimonials = [], isLoading } = useQuery<Testimonial[]>({
-    queryKey: ["/api/testimonials"],
-    queryFn: async () => {
-      const response = await fetch("/api/testimonials?active=true");
-      if (!response.ok) throw new Error("Failed to fetch testimonials");
-      return response.json();
-    },
+  const { data: testimonials = [], isLoading } = useQuery<TestimonialItem[]>({
+    queryKey: ["sanity-testimonials"],
+    queryFn: fetchTestimonials,
   });
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -121,8 +118,10 @@ export default function TestimonialsSection() {
                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 data-testid="testimonials-carousel"
               >
-                {testimonials.map((testimonial, index) => (
-                  <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
+                {testimonials.map((testimonial) => {
+                  const photoUrl = urlFor(testimonial.photo, { width: 128, height: 128 });
+                  return (
+                  <div key={testimonial._id} className="w-full flex-shrink-0 px-4">
                     <motion.div
                       className="glass-card p-12 mx-auto relative group"
                       whileHover={{ scale: 1.02 }}
@@ -138,34 +137,43 @@ export default function TestimonialsSection() {
                       {/* Testimonial Content */}
                       <div className="text-center relative z-10">
                         <blockquote className="text-fluid-xl text-foreground font-medium leading-relaxed mb-8 text-pretty max-w-3xl mx-auto">
-                          "{testimonial.content}"
+                          "{testimonial.quote}"
                         </blockquote>
                         
-                        {/* Rating Stars */}
                         <div className="flex justify-center space-x-1 mb-6">
-                          {Array.from({ length: testimonial.rating || 5 }).map((_, i) => (
-                            <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400 animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                           ))}
                         </div>
                         
-                        {/* Author Info */}
                         <div className="flex items-center justify-center space-x-4">
+                          {photoUrl ? (
+                            <img
+                              src={photoUrl}
+                              alt={testimonial.name}
+                              className="w-16 h-16 rounded-full object-cover"
+                            />
+                          ) : (
                           <div className="w-16 h-16 gradient-primary rounded-full flex items-center justify-center group-hover:animate-pulse-glow transition-all">
                             <span className="text-xl font-bold text-white">
                               {testimonial.name.charAt(0)}
                             </span>
                           </div>
+                          )}
                           <div className="text-left">
                             <h4 className="text-fluid-lg font-bold text-foreground">{testimonial.name}</h4>
                             {testimonial.role && (
-                              <p className="text-muted-foreground text-sm capitalize">{testimonial.role}</p>
+                              <p className="text-muted-foreground text-sm">{testimonial.role}</p>
+                            )}
+                            {testimonial.achievement && (
+                              <p className="text-muted-foreground text-xs">{testimonial.achievement}</p>
                             )}
                           </div>
                         </div>
                       </div>
                     </motion.div>
                   </div>
-                ))}
+                );})}
               </div>
             </div>
             
