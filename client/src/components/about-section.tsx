@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Target, Zap, Handshake } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { urlFor } from "@/lib/sanityImage";
-import fallbackAbout from "@assets/image_1758795389950.png";
 
 const approachPoints = [
   {
@@ -29,8 +28,7 @@ const approachPoints = [
 
 export default function AboutSection() {
   const { data: settings } = useSiteSettings();
-  const aboutSrc =
-    urlFor(settings?.aboutImage, { width: 800, height: 1000 }) ?? fallbackAbout;
+  const aboutSrc = urlFor(settings?.aboutImage, { width: 800, height: 1000 });
 
   return (
     <section id="about" className="py-20 bg-background">
@@ -43,12 +41,23 @@ export default function AboutSection() {
 
           <div className="grid lg:grid-cols-3 gap-12 items-center">
             <div className="lg:col-span-1">
-              <img
-                src={aboutSrc}
-                alt={settings?.aboutImage?.alt || "Neel Prabhu"}
-                className="w-full h-80 object-cover object-top rounded-lg mb-6 shadow-md"
-                data-testid="img-neel-prabhu"
-              />
+              {aboutSrc ? (
+                <img
+                  src={aboutSrc}
+                  alt={settings?.aboutImage?.alt || "Neel Prabhu"}
+                  className="w-full h-80 object-cover object-top rounded-lg mb-6 shadow-md"
+                  data-testid="img-neel-prabhu"
+                />
+              ) : (
+                <div
+                  className="w-full h-80 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg flex items-center justify-center mb-6 border border-primary/20"
+                  data-testid="img-neel-prabhu"
+                >
+                  <div className="w-28 h-28 compass-gradient rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-5xl text-primary-foreground font-bold">NP</span>
+                  </div>
+                </div>
+              )}
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
                 <h4 className="font-semibold text-foreground mb-3">Professional Credentials</h4>
                 <div className="space-y-2 text-sm text-muted-foreground">
